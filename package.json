@@ -1,0 +1,37 @@
+{
+  "name": "with",
+  "version": "1.0.0",
+  "description": "coffee",
+  "main": "index.js",
+  "scripts": {
+    "build": "waffle",
+    "test": "export NODE_ENV=test && mocha",
+    "coverage": "npx truffle run coverage",
+    "docs": "scripts/docs.sh",
+    "lint": "npm run lint:js && npm run lint:sol",
+    "lint:js": "eslint '*/**/*.{js,ts}' --quiet --fix",
+    "lint:sol": "solhint --max-warnings 0 \"contracts/**/*.sol\"",
+    "prettier": "prettier --write **/*.sol",
+    "vertigo": "scripts/vertigo.sh",
+    "analyze": "slither ./contracts"
+  },
+  "author": "yoonsung",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/chai": "^4.2.12",
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^14.0.27",
+    "chai": "^4.2.0",
+    "eslint": "^6.5.1",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eth-gas-reporter": "^0.2.17",
+    "ethereum-waffle": "^3.0.2",
+    "ethers": "^5.0.8",
+    "mocha": "^8.1.1",
+    "prettier": "^1.19.1",
+    "prettier-plugin-solidity": "^1.0.0-alpha.56",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7"
+  }
+}
