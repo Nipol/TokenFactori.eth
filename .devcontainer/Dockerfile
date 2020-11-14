@@ -5,7 +5,8 @@
 
 # To fully customize the contents of this image, use the following Dockerfile instead:
 # https://github.com/microsoft/vscode-dev-containers/tree/v0.106.0/containers/typescript-node-12/.devcontainer/Dockerfile
-FROM mcr.microsoft.com/vscode/devcontainers/typescript-node:0-12
+ARG VARIANT="14-buster"
+FROM mcr.microsoft.com/vscode/devcontainers/typescript-node:0-${VARIANT}
 
 # ** [Optional] Uncomment this section to install additional packages. **
 #
@@ -18,14 +19,10 @@ RUN apt-get update \
     && locale-gen \
     # timezone
     && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
-    # for vertigo
-    # && pip3 install eth-vertigo \
+    #
     # install solc-select
     && git clone https://github.com/crytic/solc-select.git \
     && ./solc-select/scripts/install.sh \
-    # oh my zsh
-    && chsh -s $(which zsh) \
-    && wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh || true \ 
     #
     # Clean up
     && apt-get autoremove -y \
