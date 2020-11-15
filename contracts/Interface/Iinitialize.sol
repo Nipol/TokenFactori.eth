@@ -3,10 +3,9 @@ pragma solidity ^0.6.0;
 
 interface Iinitialize {
     function initialize(
-        address owner,
-        string calldata version,
-        string calldata name,
-        string calldata symbol,
-        uint8 decimals
+        string calldata contractVersion,
+        string calldata tokenName,
+        string calldata tokenSymbol,
+        uint8 tokenDecimals
     ) external;
 }

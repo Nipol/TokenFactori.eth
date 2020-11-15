@@ -9,7 +9,7 @@
         "settings": {
           "optimizer": {
             "enabled": true,
-            "runs": 999999
+            "runs": 9999999
           },
           "outputSelection": {
             "*": {
@@ -34,41 +34,6 @@
         "AbstractERC20"
       ]
     },
-    "/workspaces/TokenFactory/contracts/abstract/ERC2612.sol": {
-      "lastModificationDate": 1605335717364,
-      "sourceName": "contracts/abstract/ERC2612.sol",
-      "solcConfig": {
-        "version": "0.6.12",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 999999
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "./ERC20.sol"
-      ],
-      "versionPragmas": [
-        "^0.6.0"
-      ],
-      "artifacts": [
-        "AbstractERC2612"
-      ]
-    },
     "/workspaces/TokenFactory/contracts/Library/SafeMath.sol": {
       "lastModificationDate": 1597154461534,
       "sourceName": "contracts/Library/SafeMath.sol",
@@ -77,7 +42,7 @@
         "settings": {
           "optimizer": {
             "enabled": true,
-            "runs": 999999
+            "runs": 9999999
           },
           "outputSelection": {
             "*": {
@@ -110,7 +75,7 @@
         "settings": {
           "optimizer": {
             "enabled": true,
-            "runs": 999999
+            "runs": 9999999
           },
           "outputSelection": {
             "*": {
@@ -143,7 +108,7 @@
         "settings": {
           "optimizer": {
             "enabled": true,
-            "runs": 999999
+            "runs": 9999999
           },
           "outputSelection": {
             "*": {
@@ -170,72 +135,6 @@
         "Authority"
       ]
     },
-    "/workspaces/TokenFactory/contracts/Interface/IERC20.sol": {
-      "lastModificationDate": 1605332633682,
-      "sourceName": "contracts/Interface/IERC20.sol",
-      "solcConfig": {
-        "version": "0.6.12",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 999999
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.6.0"
-      ],
-      "artifacts": [
-        "IERC20"
-      ]
-    },
-    "/workspaces/TokenFactory/contracts/Interface/IERC165.sol": {
-      "lastModificationDate": 1605333644722,
-      "sourceName": "contracts/Interface/IERC165.sol",
-      "solcConfig": {
-        "version": "0.6.12",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 999999
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.6.0"
-      ],
-      "artifacts": [
-        "IERC165"
-      ]
-    },
     "/workspaces/TokenFactory/contracts/Interface/IERC173.sol": {
       "lastModificationDate": 1593588122272,
       "sourceName": "contracts/Interface/IERC173.sol",
@@ -244,7 +143,7 @@
         "settings": {
           "optimizer": {
             "enabled": true,
-            "runs": 999999
+            "runs": 9999999
           },
           "outputSelection": {
             "*": {
@@ -277,7 +176,7 @@
         "settings": {
           "optimizer": {
             "enabled": true,
-            "runs": 999999
+            "runs": 9999999
           },
           "outputSelection": {
             "*": {
@@ -310,7 +209,7 @@
         "settings": {
           "optimizer": {
             "enabled": true,
-            "runs": 999999
+            "runs": 9999999
           },
           "outputSelection": {
             "*": {
@@ -345,7 +244,7 @@
         "settings": {
           "optimizer": {
             "enabled": true,
-            "runs": 999999
+            "runs": 9999999
           },
           "outputSelection": {
             "*": {
@@ -372,39 +271,6 @@
         "AddressChecker"
       ]
     },
-    "/workspaces/TokenFactory/contracts/EIP712.sol": {
-      "lastModificationDate": 1604738790820,
-      "sourceName": "contracts/EIP712.sol",
-      "solcConfig": {
-        "version": "0.6.12",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 999999
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.6.0"
-      ],
-      "artifacts": [
-        "EIP712"
-      ]
-    },
     "/workspaces/TokenFactory/contracts/Interface/IBurn.sol": {
       "lastModificationDate": 1593588122217,
       "sourceName": "contracts/Interface/IBurn.sol",
@@ -413,7 +279,7 @@
         "settings": {
           "optimizer": {
             "enabled": true,
-            "runs": 999999
+            "runs": 9999999
           },
           "outputSelection": {
             "*": {
@@ -446,7 +312,7 @@
         "settings": {
           "optimizer": {
             "enabled": true,
-            "runs": 999999
+            "runs": 9999999
           },
           "outputSelection": {
             "*": {
@@ -479,7 +345,7 @@
         "settings": {
           "optimizer": {
             "enabled": true,
-            "runs": 999999
+            "runs": 9999999
           },
           "outputSelection": {
             "*": {
@@ -514,7 +380,7 @@
         "settings": {
           "optimizer": {
             "enabled": true,
-            "runs": 999999
+            "runs": 9999999
           },
           "outputSelection": {
             "*": {
@@ -539,39 +405,6 @@
         "IERC1654"
       ]
     },
-    "/workspaces/TokenFactory/contracts/Interface/Iinitialize.sol": {
-      "lastModificationDate": 1597154351766,
-      "sourceName": "contracts/Interface/Iinitialize.sol",
-      "solcConfig": {
-        "version": "0.6.12",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 999999
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.6.0"
-      ],
-      "artifacts": [
-        "Iinitialize"
-      ]
-    },
     "/workspaces/TokenFactory/contracts/Interface/IMint.sol": {
       "lastModificationDate": 1593588122260,
       "sourceName": "contracts/Interface/IMint.sol",
@@ -580,7 +413,7 @@
         "settings": {
           "optimizer": {
             "enabled": true,
-            "runs": 999999
+            "runs": 9999999
           },
           "outputSelection": {
             "*": {
@@ -613,7 +446,7 @@
         "settings": {
           "optimizer": {
             "enabled": true,
-            "runs": 999999
+            "runs": 9999999
           },
           "outputSelection": {
             "*": {
@@ -646,7 +479,7 @@
         "settings": {
           "optimizer": {
             "enabled": true,
-            "runs": 999999
+            "runs": 9999999
           },
           "outputSelection": {
             "*": {
@@ -671,15 +504,149 @@
         "Create2Maker"
       ]
     },
+    "/workspaces/TokenFactory/contracts/Interface/IERC20.sol": {
+      "lastModificationDate": 1605336052890,
+      "sourceName": "contracts/Interface/IERC20.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 9999999
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "/workspaces/TokenFactory/contracts/Interface/IERC165.sol": {
+      "lastModificationDate": 1605336056586,
+      "sourceName": "contracts/Interface/IERC165.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 9999999
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "IERC165"
+      ]
+    },
+    "/workspaces/TokenFactory/node_modules/hardhat/console.sol": {
+      "lastModificationDate": 1605334482220,
+      "sourceName": "hardhat/console.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 9999999
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.22 <0.8.0"
+      ],
+      "artifacts": [
+        "console"
+      ]
+    },
+    "/workspaces/TokenFactory/contracts/abstract/ERC2612.sol": {
+      "lastModificationDate": 1605339867250,
+      "sourceName": "contracts/abstract/ERC2612.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 9999999
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./ERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "AbstractERC2612"
+      ]
+    },
     "/workspaces/TokenFactory/contracts/StandardToken.sol": {
-      "lastModificationDate": 1605335996323,
+      "lastModificationDate": 1605348534855,
       "sourceName": "contracts/StandardToken.sol",
       "solcConfig": {
         "version": "0.6.12",
         "settings": {
           "optimizer": {
             "enabled": true,
-            "runs": 999999
+            "runs": 9999999
           },
           "outputSelection": {
             "*": {
@@ -704,6 +671,7 @@
         "./Interface/IERC165.sol",
         "./Interface/IERC173.sol",
         "./Interface/IERC2612.sol",
+        "./Interface/Iinitialize.sol",
         "./abstract/ERC2612.sol"
       ],
       "versionPragmas": [
@@ -711,6 +679,39 @@
       ],
       "artifacts": [
         "StandardToken"
+      ]
+    },
+    "/workspaces/TokenFactory/contracts/Interface/Iinitialize.sol": {
+      "lastModificationDate": 1605348427563,
+      "sourceName": "contracts/Interface/Iinitialize.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 9999999
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "Iinitialize"
       ]
     }
   }

@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { Contract, BigNumber, constants, Signer } from 'ethers';
 
-describe('StandardToken', () => {
+describe('StandardToken/ERC20', () => {
   let StandardToken: Contract;
 
   const contractVersion = '1';
@@ -19,12 +19,11 @@ describe('StandardToken', () => {
     const accounts = await ethers.getSigners();
     [wallet, walletTo, Dummy] = accounts;
 
-    const StandardTokenTemplate = await ethers.getContractFactory('StandardToken', wallet);
+    const StandardTokenTemplate = await ethers.getContractFactory('contracts/StandardToken.sol:StandardToken', wallet);
     StandardToken = await StandardTokenTemplate.deploy();
 
     await StandardToken.deployed();
-    const walletAddress = await wallet.getAddress();
-    await StandardToken.initialize(walletAddress, contractVersion, tokenName, tokenSymbol, tokenDecimals);
+    await StandardToken.initialize(contractVersion, tokenName, tokenSymbol, tokenDecimals);
     await StandardToken.mint(initialToken);
   });
 

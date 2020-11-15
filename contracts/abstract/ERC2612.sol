@@ -32,6 +32,10 @@ abstract contract AbstractERC2612 is AbstractERC20 {
 
     mapping(address => uint256) public nonces;
 
+    function version() external view returns (string memory) {
+        return _version;
+    }
+
     /**
      * @notice Initialize EIP712 Domain Separator
      * @param version     version of contract
@@ -101,8 +105,8 @@ abstract contract AbstractERC2612 is AbstractERC20 {
 
         // bytes memory digest = abi.encode(
         //     PERMIT_TYPEHASH,
-        //     from,
-        //     to,
+        //     owner,
+        //     spender,
         //     value,
         //     nonces[owner]++,
         //     deadline
