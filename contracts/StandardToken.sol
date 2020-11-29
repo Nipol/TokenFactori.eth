@@ -13,10 +13,12 @@ import "./Interface/IERC173.sol";
 import "./Interface/IERC2612.sol";
 import "./Interface/Iinitialize.sol";
 import {AbstractERC2612} from "./abstract/ERC2612.sol";
+import {AbstractInitializer} from "./abstract/Initializer.sol";
 
 contract StandardToken is
     Authority,
     AbstractERC2612,
+    AbstractInitializer,
     Iinitialize,
     IERC2612,
     IERC165,
@@ -38,7 +40,7 @@ contract StandardToken is
         string calldata tokenName,
         string calldata tokenSymbol,
         uint8 tokenDecimals
-    ) external override {
+    ) external override initializer {
         Authority.initialize(msg.sender);
         _initDomainSeparator(contractVersion, tokenName);
 
@@ -119,6 +121,18 @@ contract StandardToken is
         return true;
     }
 
+    function mintTo(uint256 value, address to)
+        external
+        onlyAuthority
+        returns (bool)
+    {
+        require(to != address(this), "ERC20/Not-Allowed-Transfer");
+        _totalSupply = _totalSupply.add(value);
+        _balances[to] = _balances[to].add(value);
+        emit Transfer(address(0), to, value);
+        return true;
+    }
+
     function burn(uint256 value) external onlyAuthority returns (bool) {
         _balances[msg.sender] = _balances[msg.sender].sub(
             value,
@@ -161,8 +175,8 @@ contract StandardToken is
             interfaceID == type(IERC20).interfaceId || // ERC20
             interfaceID == type(IERC165).interfaceId || // ERC165
             interfaceID == type(IERC173).interfaceId || // ERC173
-            interfaceID == type(IERC2612).interfaceId ||
-            interfaceID == type(Iinitialize).interfaceId; // ERC2612
+            interfaceID == type(IERC2612).interfaceId || // ERC2612
+            interfaceID == type(Iinitialize).interfaceId;
     }
 
     function _transfer(

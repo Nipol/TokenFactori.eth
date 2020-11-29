@@ -11,13 +11,13 @@ contract Authority is IERC173 {
         _;
     }
 
-    function owner() external override view returns (address) {
-        return _owner;
-    }
-
     function initialize(address newOwner) internal {
         _owner = newOwner;
         emit OwnershipTransferred(address(0), newOwner);
+    }
+
+    function owner() external view override returns (address) {
+        return _owner;
     }
 
     function transferOwnership(address newOwner)

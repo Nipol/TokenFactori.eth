@@ -1,75 +1,161 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 pragma solidity ^0.6.0;
 
+import "./Library/SafeMath.sol";
 import "./Library/Authority.sol";
 import "./Library/Create2Maker.sol";
 import "./Interface/IERC165.sol";
+import "./Interface/IERC173.sol";
+import "./Interface/IMint.sol";
 import "./Interface/Iinitialize.sol";
 
 contract TokenFactory is Authority, IERC165 {
+    using SafeMath for uint256;
+
     struct TemplateInfo {
-        address template,
-        uint256 price,
-        bool available,
+        address template;
+        uint256 price;
     }
 
-    TokenInfo[] public Templates;
+    struct Entity {
+        bytes32 _key;
+        TemplateInfo _value;
+    }
 
-    event NewTemplate(address indexed template, uint256 indexed price, uint256 index);
-    event RemoveTemplate(uint256 index);
+    Entity[] entities;
+    mapping(bytes32 => uint256) indexes;
+
+    event SetTemplate(
+        bytes32 indexed key,
+        address indexed template,
+        uint256 indexed price
+    );
+
+    event RemovedTemplate(bytes32 indexed key);
 
     constructor() public {
         Authority.initialize(msg.sender);
     }
 
-    function newTemplate(address template, uint256 price) public onlyOwner returns (uint256) {
-        Templates.push(TokenInfo(template, price));
-        emit NewTemplate(template, price, Templates.length - 1);
+    function newTemplate(address template, uint256 price)
+        public
+        onlyAuthority
+        returns (bytes32 key)
+    {
+        require(
+            _set(bytes32(uint256(template)), template, price),
+            "TokenFactory/Already Exist"
+        );
+        key = bytes32(uint256(template));
+        emit SetTemplate(bytes32(uint256(template)), template, price);
     }
 
-    // zero based index
-    function updateTemaplate(uint256 index, address template, uint256 price) public onlyOwner returns (bool success) {
-        TemplateInfo temp = Templates;
-        require(index < temp.length, "Out-Of-Index");
-        temp[index].template = template;
-        temp[index].template = price;
-        Templates = temp;
-        success = true;
+    function updateTemplate(
+        bytes32 key,
+        address template,
+        uint256 price
+    ) public onlyAuthority {
+        require(
+            !_set(key, template, price),
+            "TokenFactory/Template is Not Exist"
+        );
+        emit SetTemplate(key, template, price);
     }
 
-    // zero based index
-    function removeTemplate(uint256 index) public onlyOwner returns (bool success) {
-        TemplateInfo temp = Templates;
-        require(index < temp.length, "Out-Of-Index");
-
-        for (uint256 i = index; i < temp.length - 1; i++) {
-            temp[i] = temp[i+1];
-        }
-        temp.pop();
-        Templates = temp;
-        success = true;
-        event RemoveTemplate(index);
+    function deleteTemplate(bytes32 key) public onlyAuthority {
+        require(_remove(key), "TokenFactory/Template is Not Exist");
+        emit RemovedTemplate(key);
     }
 
     function newToken(
-        uint256 template,
+        bytes32 key,
         string memory version,
         string memory name,
         string memory symbol,
         uint8 decimals
-    ) public returns (address result) {
-        bytes memory initializationCalldata = abi.encodeWithSelector(
-            token.initialize.selector,
-            version,
-            name,
-            symbol,
-            decimals
+    ) public payable returns (address result) {
+        result = _newToken(key, version, name, symbol, decimals);
+        IERC173(result).transferOwnership(msg.sender);
+    }
+
+    function newTokenWithMint(
+        bytes32 key,
+        string memory version,
+        string memory name,
+        string memory symbol,
+        uint8 decimals,
+        uint256 amount
+    ) public payable returns (address result) {
+        result = _newToken(key, version, name, symbol, decimals);
+        IMint(result).mintTo(amount, msg.sender);
+        IERC173(result).transferOwnership(msg.sender);
+    }
+
+    function calculateNewTokenAddress(
+        bytes32 key,
+        string memory version,
+        string memory name,
+        string memory symbol,
+        uint8 decimals
+    ) public view returns (address result) {
+        TemplateInfo memory info = _get(key);
+
+        bytes memory initializationCalldata =
+            abi.encodeWithSelector(
+                Iinitialize(info.template).initialize.selector,
+                version,
+                name,
+                symbol,
+                decimals
+            );
+
+        bytes memory initCode =
+            abi.encodePacked(
+                type(Create2Maker).creationCode,
+                abi.encode(address(info.template), initializationCalldata)
+            );
+
+        (, result) = _getSaltAndTarget(initCode);
+    }
+
+    function supportsInterface(bytes4 interfaceID)
+        external
+        view
+        override
+        returns (bool)
+    {
+        return
+            interfaceID == type(IERC165).interfaceId || // ERC165
+            interfaceID == type(Iinitialize).interfaceId; // ERC2612
+    }
+
+    function _newToken(
+        bytes32 key,
+        string memory version,
+        string memory name,
+        string memory symbol,
+        uint8 decimals
+    ) internal returns (address result) {
+        TemplateInfo memory info = _get(key);
+        require(
+            info.price == msg.value,
+            "TokenFactory/Amount deposited is different"
         );
 
-        bytes memory create2Code = abi.encodePacked(
-            type(Create2Maker).creationCode,
-            abi.encode(address(token), initializationCalldata)
-        );
+        bytes memory initializationCalldata =
+            abi.encodeWithSelector(
+                Iinitialize(info.template).initialize.selector,
+                version,
+                name,
+                symbol,
+                decimals
+            );
+
+        bytes memory create2Code =
+            abi.encodePacked(
+                type(Create2Maker).creationCode,
+                abi.encode(address(info.template), initializationCalldata)
+            );
 
         (bytes32 salt, ) = _getSaltAndTarget(create2Code);
 
@@ -91,30 +177,6 @@ contract TokenFactory is Authority, IERC165 {
                 revert(0, returndatasize())
             }
         }
-    }
-
-    function calculateNewTokenAddress(
-        address contractOwner,
-        string memory version,
-        string memory name,
-        string memory symbol,
-        uint8 decimals
-    ) public view returns (address result) {
-        bytes memory initializationCalldata = abi.encodeWithSelector(
-            token.initialize.selector,
-            contractOwner,
-            version,
-            name,
-            symbol,
-            decimals
-        );
-
-        bytes memory initCode = abi.encodePacked(
-            type(Create2Maker).creationCode,
-            abi.encode(address(token), initializationCalldata)
-        );
-
-        (, result) = _getSaltAndTarget(initCode);
     }
 
     function _getSaltAndTarget(bytes memory initCode)
@@ -164,5 +226,79 @@ contract TokenFactory is Authority, IERC165 {
             // otherwise, increment the nonce and derive a new salt.
             nonce++;
         }
+    }
+
+    function _set(
+        bytes32 key,
+        address template,
+        uint256 price
+    ) private returns (bool) {
+        uint256 keyIndex = indexes[key];
+
+        TemplateInfo memory tmp =
+            TemplateInfo({template: template, price: price});
+
+        if (keyIndex == 0) {
+            entities.push(Entity({_key: key, _value: tmp}));
+            indexes[key] = entities.length;
+            return true;
+        } else {
+            entities[keyIndex.sub(1)]._value = tmp;
+            return false;
+        }
+    }
+
+    function _remove(bytes32 key) private returns (bool) {
+        uint256 keyIndex = indexes[key];
+
+        if (keyIndex != 0) {
+            uint256 toDeleteIndex = keyIndex.sub(1);
+            uint256 lastIndex = entities.length.sub(1);
+
+            Entity storage lastEntity = entities[lastIndex];
+
+            entities[toDeleteIndex] = lastEntity;
+            indexes[lastEntity._key] = toDeleteIndex.add(1);
+
+            entities.pop();
+
+            delete indexes[key];
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function _contains(bytes32 key) private view returns (bool) {
+        return indexes[key] != 0;
+    }
+
+    function _length() private view returns (uint256) {
+        return entities.length;
+    }
+
+    function _at(uint256 index)
+        private
+        view
+        returns (bytes32, TemplateInfo memory)
+    {
+        require(entities.length > index, "index out of bounds");
+
+        Entity storage entity = entities[index];
+        return (entity._key, entity._value);
+    }
+
+    function _get(bytes32 key) private view returns (TemplateInfo memory) {
+        return _get(key, "nonexistent key");
+    }
+
+    function _get(bytes32 key, string memory errorMessage)
+        private
+        view
+        returns (TemplateInfo memory)
+    {
+        uint256 keyIndex = indexes[key];
+        require(keyIndex != 0, errorMessage); // Equivalent to contains(map, key)
+        return entities[keyIndex.sub(1)]._value; // All indexes are 1-based
     }
 }

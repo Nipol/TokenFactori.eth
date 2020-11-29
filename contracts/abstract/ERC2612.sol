@@ -18,30 +18,28 @@ import {AbstractERC20} from "./ERC20.sol";
  *   withdrawal attacks
  */
 abstract contract AbstractERC2612 is AbstractERC20 {
-    bytes32 public constant EIP712DOMAIN_TYPEHASH = keccak256(
-        "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
-    );
+    bytes32 public constant EIP712DOMAIN_TYPEHASH =
+        keccak256(
+            "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
+        );
 
-    bytes32 public constant PERMIT_TYPEHASH = keccak256(
-        "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
-    );
+    bytes32 public constant PERMIT_TYPEHASH =
+        keccak256(
+            "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
+        );
 
     bytes32 public DOMAIN_SEPARATOR;
 
-    string private _version;
+    string public version;
 
     mapping(address => uint256) public nonces;
 
-    function version() external view returns (string memory) {
-        return _version;
-    }
-
     /**
      * @notice Initialize EIP712 Domain Separator
-     * @param version     version of contract
-     * @param name        name of contract
+     * @param _version     version of contract
+     * @param _name        name of contract
      */
-    function _initDomainSeparator(string memory version, string memory name)
+    function _initDomainSeparator(string memory _version, string memory _name)
         internal
     {
         uint256 chainId;
@@ -50,13 +48,13 @@ abstract contract AbstractERC2612 is AbstractERC20 {
             chainId := chainid()
         }
 
-        _version = version;
+        version = _version;
 
         DOMAIN_SEPARATOR = keccak256(
             abi.encode(
                 EIP712DOMAIN_TYPEHASH,
-                keccak256(bytes(name)), // name
-                keccak256(bytes(version)), // version
+                keccak256(bytes(_name)), // name
+                keccak256(bytes(_version)), // version
                 chainId, // chainid
                 address(this) // this address
             )
@@ -86,22 +84,23 @@ abstract contract AbstractERC2612 is AbstractERC20 {
         require(deadline >= now, "ERC2612/Expired-time");
 
         // @TODO: Gas Testing
-        bytes32 digest = keccak256(
-            abi.encodePacked(
-                "\x19\x01",
-                DOMAIN_SEPARATOR,
-                keccak256(
-                    abi.encode(
-                        PERMIT_TYPEHASH,
-                        owner,
-                        spender,
-                        value,
-                        nonces[owner]++,
-                        deadline
+        bytes32 digest =
+            keccak256(
+                abi.encodePacked(
+                    "\x19\x01",
+                    DOMAIN_SEPARATOR,
+                    keccak256(
+                        abi.encode(
+                            PERMIT_TYPEHASH,
+                            owner,
+                            spender,
+                            value,
+                            nonces[owner]++,
+                            deadline
+                        )
                     )
                 )
-            )
-        );
+            );
 
         // bytes memory digest = abi.encode(
         //     PERMIT_TYPEHASH,

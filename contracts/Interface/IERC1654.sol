@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 pragma solidity ^0.6.0;
 
-
 interface IERC1654 {
     // bytes4(keccak256("isValidSignature(bytes32,bytes)")
     // bytes4 internal constant MAGICVALUE = 0x1626ba7e;
@@ -16,5 +15,8 @@ interface IERC1654 {
      * MUST allow external calls
      */
 
-    function isValidSignature(bytes32 _data, bytes calldata _signature) external view returns (bytes4);
+    function isValidSignature(bytes32 _data, bytes calldata _signature)
+        external
+        view
+        returns (bytes4);
 }
