@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { Contract, BigNumber, constants, Signer, utils } from 'ethers';
+import { Contract, BigNumber, constants, Signer, utils, ContractFactory } from 'ethers';
 
 const addressToBytes32 = (address: string): string => {
   if (address.length === 42) {
@@ -13,6 +13,8 @@ const addressToBytes32 = (address: string): string => {
 };
 
 describe('TokenFactory', () => {
+  let TokenFactoryTemplate: ContractFactory;
+  let StandardTokenTemplate: ContractFactory;
   let TokenFactory: Contract;
   let StandardToken: Contract;
 
@@ -30,10 +32,12 @@ describe('TokenFactory', () => {
     const accounts = await ethers.getSigners();
     [wallet, walletTo, Dummy] = accounts;
 
-    const TokenFactoryTemplate = await ethers.getContractFactory('contracts/TokenFactory.sol:TokenFactory', wallet);
+    TokenFactoryTemplate = await ethers.getContractFactory('contracts/TokenFactory.sol:TokenFactory', wallet);
     TokenFactory = await TokenFactoryTemplate.deploy();
 
-    const StandardTokenTemplate = await ethers.getContractFactory('contracts/StandardToken.sol:StandardToken', wallet);
+    await TokenFactory.deployed();
+
+    StandardTokenTemplate = await ethers.getContractFactory('contracts/StandardToken.sol:StandardToken', wallet);
     StandardToken = await StandardTokenTemplate.deploy();
 
     await StandardToken.deployed();
@@ -49,6 +53,8 @@ describe('TokenFactory', () => {
         .to.emit(TokenFactory, 'SetTemplate')
         .withArgs(key, tokenAddress, value);
     });
+
+    //@TODO: Interface check
 
     it('should be revert when set same token template', async () => {
       const tokenAddress = StandardToken.address;
@@ -74,6 +80,8 @@ describe('TokenFactory', () => {
         .to.emit(TokenFactory, 'SetTemplate')
         .withArgs(key, tokenAddress, afterValue);
     });
+
+    //@TODO: Interface check
 
     it('should be revert when set same token template', async () => {
       const tokenAddress = StandardToken.address;
@@ -102,6 +110,74 @@ describe('TokenFactory', () => {
       const tokenAddress = StandardToken.address;
       const key = addressToBytes32(tokenAddress);
       await expect(TokenFactory.deleteTemplate(key)).to.be.revertedWith('TokenFactory/Template is Not Exist');
+    });
+  });
+
+  describe('#newToken()', () => {
+    it('should be success when create new token with correct amount', async () => {
+      const tokenAddress = StandardToken.address;
+      const value = utils.parseUnits('0');
+      const key = addressToBytes32(tokenAddress);
+      await expect(TokenFactory.newTemplate(tokenAddress, value))
+        .to.emit(TokenFactory, 'SetTemplate')
+        .withArgs(key, tokenAddress, value);
+      const contractVersion = '1';
+      const tokenName = 'Sample';
+      const tokenSymbol = 'SAM';
+      const tokenDecimals = BigNumber.from('18');
+      const calculatedTokenAddress = await TokenFactory.calculateNewTokenAddress(key, contractVersion, tokenName, tokenSymbol, tokenDecimals);
+      await expect(TokenFactory.newToken(key, contractVersion, tokenName, tokenSymbol, tokenDecimals)).to.emit(TokenFactory, 'GeneratedToken').withArgs(wallet.getAddress, calculatedTokenAddress);
+    });
+
+    it('should be reverted when create new token with different deposit amount', async () => {
+      const tokenAddress = StandardToken.address;
+      const value = utils.parseUnits('0.01');
+      const key = addressToBytes32(tokenAddress);
+      await expect(TokenFactory.newTemplate(tokenAddress, value))
+        .to.emit(TokenFactory, 'SetTemplate')
+        .withArgs(key, tokenAddress, value);
+      const contractVersion = '1';
+      const tokenName = 'Sample';
+      const tokenSymbol = 'SAM';
+      const tokenDecimals = BigNumber.from('18');
+      const calculatedTokenAddress = await TokenFactory.calculateNewTokenAddress(key, contractVersion, tokenName, tokenSymbol, tokenDecimals);
+      await expect(TokenFactory.newToken(key, contractVersion, tokenName, tokenSymbol, tokenDecimals)).to.be.revertedWith('TokenFactory/Different deposited');
+    });
+  });
+
+  describe('#newTokenWithMint()', () => {
+    it('should be success when create new token with correct amount', async () => {
+      const tokenAddress = StandardToken.address;
+      const value = utils.parseUnits('0');
+      const key = addressToBytes32(tokenAddress);
+      await expect(TokenFactory.newTemplate(tokenAddress, value))
+        .to.emit(TokenFactory, 'SetTemplate')
+        .withArgs(key, tokenAddress, value);
+      const contractVersion = '1';
+      const tokenName = 'Sample';
+      const tokenSymbol = 'SAM';
+      const tokenDecimals = BigNumber.from('18');
+      const initialToken = BigNumber.from('100000000000000000000');
+      const calculatedTokenAddress = await TokenFactory.calculateNewTokenAddress(key, contractVersion, tokenName, tokenSymbol, tokenDecimals);
+      await expect(TokenFactory.newTokenWithMint(key, contractVersion, tokenName, tokenSymbol, tokenDecimals, initialToken)).to.emit(TokenFactory, 'GeneratedToken').withArgs(await wallet.getAddress(), calculatedTokenAddress);
+      const GeneratedToken = await StandardTokenTemplate.attach(calculatedTokenAddress);
+      expect(await GeneratedToken.balanceOf(await wallet.getAddress())).to.equal(initialToken);
+      expect(await GeneratedToken.symbol()).to.equal(tokenSymbol);
+    });
+
+    it('should be reverted when create new token with different deposit amount', async () => {
+      const tokenAddress = StandardToken.address;
+      const value = utils.parseUnits('0.01');
+      const key = addressToBytes32(tokenAddress);
+      await expect(TokenFactory.newTemplate(tokenAddress, value))
+        .to.emit(TokenFactory, 'SetTemplate')
+        .withArgs(key, tokenAddress, value);
+      const contractVersion = '1';
+      const tokenName = 'Sample';
+      const tokenSymbol = 'SAM';
+      const tokenDecimals = BigNumber.from('18');
+      const initialToken = BigNumber.from('100000000000000000000');
+      await expect(TokenFactory.newTokenWithMint(key, contractVersion, tokenName, tokenSymbol, tokenDecimals, initialToken)).to.be.revertedWith('TokenFactory/Different deposited');
     });
   });
 });

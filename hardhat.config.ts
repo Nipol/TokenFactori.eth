@@ -52,12 +52,12 @@ export default {
     coverage: {
       url: 'http://localhost:8555',
     },
-    // rinkeby: {
-    //   url: `https://${process.env.RIVET_KEY}.rinkeby.rpc.rivet.cloud/`,
-    //   accounts: [`${process.env.DEPOLYER_PK}`],
-    //   gasPrice: 8000000000,
-    //   timeout: 500000
-    // }
+    goerli: {
+      url: `https://${process.env.RIVET_KEY}.goerli.rpc.rivet.cloud/`,
+      accounts: [`${process.env.DEPLOYER_PK}`],
+      gasPrice: 8000000000,
+      timeout: 500000
+    }
   },
   solidity: {
     version: '0.6.12',
@@ -79,6 +79,6 @@ export default {
   },
   gasReporter: {
     currency: 'USD',
-    gasPrice: 20,
+    gasPrice: 40,
   },
 };

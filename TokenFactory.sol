@@ -1,14 +1,275 @@
+// Sources flattened with hardhat v2.0.4 https://hardhat.org
+
+// File contracts/Library/SafeMath.sol
+
 // SPDX-License-Identifier: LGPL-3.0-or-later
 pragma solidity ^0.6.0;
 
-import "./Library/SafeMath.sol";
-import "./Library/Authority.sol";
-import "./Library/Create2Maker.sol";
-import "./Interface/IERC165.sol";
-import "./Interface/IERC173.sol";
-import "./Interface/IMint.sol";
-import "./Interface/ITokenFactory.sol";
-import "./Interface/Iinitialize.sol";
+library SafeMath {
+    uint256 internal constant WAD = 1e18;
+    uint256 internal constant RAY = 1e27;
+    uint256 internal constant RAD = 1e45;
+
+    function add(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require((z = x + y) >= x, "Math/Add-Overflow");
+    }
+
+    function sub(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require((z = x - y) <= x, "Math/Sub-Overflow");
+    }
+
+    function sub(
+        uint256 x,
+        uint256 y,
+        string memory message
+    ) internal pure returns (uint256 z) {
+        require((z = x - y) <= x, message);
+    }
+
+    function mul(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require(y == 0 || ((z = x * y) / y) == x, "Math/Mul-Overflow");
+    }
+
+    function div(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require(y > 0, "Math/Div-Overflow");
+        z = x / y;
+    }
+
+    function mod(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require(y != 0, "Math/Mod-Overflow");
+        z = x % y;
+    }
+
+    function wmul(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        z = add(mul(x, y), WAD / 2) / WAD;
+    }
+
+    function wdiv(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        z = add(mul(x, WAD), y / 2) / y;
+    }
+
+    function rmul(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        z = add(mul(x, y), RAY / 2) / RAY;
+    }
+
+    function rdiv(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        z = add(mul(x, RAY), y / 2) / y;
+    }
+
+    function toWAD(uint256 wad, uint256 decimal)
+        internal
+        pure
+        returns (uint256 z)
+    {
+        require(decimal < 18, "Math/Too-high-decimal");
+        z = mul(wad, 10**(18 - decimal));
+    }
+}
+
+
+// File contracts/Interface/IERC173.sol
+
+pragma solidity ^0.6.0;
+
+/// @title ERC-173 Contract Ownership Standard
+/// @dev See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-173.md
+///  Note: the ERC-165 identifier for this interface is 0x7f5828d0
+/* is ERC165 */
+interface IERC173 {
+    /// @dev This emits when ownership of a contract changes.
+    event OwnershipTransferred(
+        address indexed previousOwner,
+        address indexed newOwner
+    );
+
+    /// @notice Get the address of the owner
+    /// @return The address of the owner.
+    function owner() external view returns (address);
+
+    /// @notice Set the address of the new owner of the contract
+    /// @param newOwner The address of the new owner of the contract
+    function transferOwnership(address newOwner) external;
+}
+
+
+// File contracts/Library/Authority.sol
+
+pragma solidity ^0.6.0;
+
+contract Authority is IERC173 {
+    address private _owner;
+
+    modifier onlyAuthority() {
+        require(_owner == msg.sender, "Authority/Not-Authorized");
+        _;
+    }
+
+    function initialize(address newOwner) internal {
+        _owner = newOwner;
+        emit OwnershipTransferred(address(0), newOwner);
+    }
+
+    function owner() external view override returns (address) {
+        return _owner;
+    }
+
+    function transferOwnership(address newOwner)
+        external
+        override
+        onlyAuthority
+    {
+        _owner = newOwner;
+        emit OwnershipTransferred(msg.sender, newOwner);
+    }
+}
+
+
+// File contracts/Library/Create2Maker.sol
+
+pragma solidity ^0.6.0;
+
+contract Create2Maker {
+    constructor(address template, bytes memory initializationCalldata)
+        public
+        payable
+    {
+        // solhint-disable-next-line avoid-low-level-calls
+        (bool success, ) = template.delegatecall(initializationCalldata);
+        if (!success) {
+            // pass along failure message from delegatecall and revert.
+            // solhint-disable-next-line no-inline-assembly
+            assembly {
+                returndatacopy(0, 0, returndatasize())
+                revert(0, returndatasize())
+            }
+        }
+
+        // place eip-1167 runtime code in memory.
+        bytes memory runtimeCode =
+            abi.encodePacked(
+                bytes10(0x363d3d373d3d3d363d73),
+                template,
+                bytes15(0x5af43d82803e903d91602b57fd5bf3)
+            );
+
+        // return eip-1167 code to write it to spawned contract runtime.
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            return(add(0x20, runtimeCode), 45) // eip-1167 runtime code, length
+        }
+    }
+}
+
+
+// File contracts/Interface/IERC165.sol
+
+pragma solidity ^0.6.0;
+
+interface IERC165 {
+    /// @notice Query if a contract implements an interface
+    /// @param interfaceID The interface identifier, as specified in ERC-165
+    /// @dev Interface identification is specified in ERC-165. This function
+    ///  uses less than 30,000 gas.
+    /// @return `true` if the contract implements `interfaceID` and
+    ///  `interfaceID` is not 0xffffffff, `false` otherwise
+    function supportsInterface(bytes4 interfaceID) external view returns (bool);
+}
+
+
+// File contracts/Interface/IMint.sol
+
+pragma solidity ^0.6.0;
+
+interface IMint {
+    function mint(uint256 value) external returns (bool);
+
+    function mintTo(uint256 value, address to) external returns (bool);
+}
+
+
+// File contracts/Interface/ITokenFactory.sol
+
+pragma solidity ^0.6.0;
+
+interface ITokenFactory {
+    struct TemplateInfo {
+        address template;
+        uint256 price;
+    }
+
+    event SetTemplate(
+        bytes32 indexed key,
+        address indexed template,
+        uint256 indexed price
+    );
+
+    event RemovedTemplate(bytes32 indexed key);
+
+    event GeneratedToken(address owner, address token);
+
+    function newTemplate(address template, uint256 price)
+        external
+        returns (bytes32 key);
+
+    function updateTemplate(
+        bytes32 key,
+        address template,
+        uint256 price
+    ) external;
+
+    function deleteTemplate(bytes32 key) external;
+
+    function newToken(
+        bytes32 key,
+        string memory version,
+        string memory name,
+        string memory symbol,
+        uint8 decimals
+    ) external payable returns (address result);
+
+    function newTokenWithMint(
+        bytes32 key,
+        string memory version,
+        string memory name,
+        string memory symbol,
+        uint8 decimals,
+        uint256 amount
+    ) external payable returns (address result);
+
+    function calculateNewTokenAddress(
+        bytes32 key,
+        string memory version,
+        string memory name,
+        string memory symbol,
+        uint8 decimals
+    ) external view returns (address result);
+}
+
+
+// File contracts/Interface/Iinitialize.sol
+
+pragma solidity ^0.6.0;
+
+interface Iinitialize {
+    function initialize(
+        string calldata contractVersion,
+        string calldata tokenName,
+        string calldata tokenSymbol,
+        uint8 tokenDecimals
+    ) external;
+}
+
+
+// File contracts/TokenFactory.sol
+
+pragma solidity ^0.6.0;
+
+
+
+
+
+
+
 
 contract TokenFactory is Authority, IERC165, ITokenFactory {
     using SafeMath for uint256;
