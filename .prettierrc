@@ -12,7 +12,7 @@
     {
       "files": "*.sol",
       "options": {
-        "printWidth": 79,
+        "printWidth": 80,
         "tabWidth": 4,
         "useTabs": false,
         "singleQuote": false,

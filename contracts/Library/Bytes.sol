@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 pragma solidity ^0.6.0;
 
-
 library Bytes {
     function mergeSignature(
         uint8 r,
@@ -47,7 +46,9 @@ library Bytes {
                 // second 32 bytes.
                 vs := mload(add(sig, 64))
             }
-            s = vs & 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
+            s =
+                vs &
+                0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
             v = 27 + uint8(uint256(vs) >> 255);
         }
 
